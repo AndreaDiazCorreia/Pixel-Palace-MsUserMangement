@@ -7,6 +7,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PixelUserRepository extends JpaRepository<PixelUser, Long> {
 
+    PixelUser findByUsername(String username);
+    PixelUser findByEmail(String email);
 
 
 }

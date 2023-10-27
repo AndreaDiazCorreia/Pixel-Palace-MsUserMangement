@@ -28,6 +28,31 @@ public class PixelUserServiceImpl implements PixelUserService {
     }
 
 
+
+    @Override
+    public void deleteUser(PixelUser pixelUser) {
+
+        pixelUserRepository.delete(pixelUser);
+    }
+
+    @Override
+    public PixelUser findById(long id) {
+        return pixelUserRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public PixelUser findByUsername(String username) {
+        return pixelUserRepository.findByUsername(username);
+    }
+
+    @Override
+    public PixelUser findByEmail(String email) {
+        return pixelUserRepository.findByEmail(email);
+    }
+
+
+
+/*
     public ResponseEntity<Object> deleteUser(long id){
         if (!pixelUserRepository.existsById(id)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("El usuario con ID " + id + " no se encontró en la base de datos.");
@@ -42,6 +67,8 @@ public class PixelUserServiceImpl implements PixelUserService {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("No se pudo eliminar al usuario.");
         }
     }
+
+ */
 
 
 }
