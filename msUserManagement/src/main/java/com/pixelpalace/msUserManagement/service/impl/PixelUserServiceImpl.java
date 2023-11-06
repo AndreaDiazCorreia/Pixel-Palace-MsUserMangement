@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import jakarta.ws.rs.NotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -41,6 +42,23 @@ public class PixelUserServiceImpl implements PixelUserService {
             }catch (EmptyResultDataAccessException e){
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("No se pudo eliminar al usuario.");
         }
+    }
+
+
+    @Override
+    public PixelUser update(Long id, PixelUser user) {
+        PixelUser existingUser = pixelUserRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found with id: " + id));
+
+
+        existingUser.setName(user.getName());
+        existingUser.setLastname(user.getLastname());
+        existingUser.setUsername(user.getUsername());
+        existingUser.setPassword(user.getPassword());
+        existingUser.setEmail(user.getEmail());
+        existingUser.setBirthday(user.getBirthday());
+
+
+        return pixelUserRepository.save(existingUser);
     }
 
 
