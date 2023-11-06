@@ -1,6 +1,6 @@
 package com.pixelpalace.msUserManagement.model;
 
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -41,5 +41,18 @@ public class PixelUser {
     @DateTimeFormat(pattern = "dd-mm-yyyy")
     private String birthday;
 
+    
+    @JsonIgnore
+    private String existingName;
+    @JsonIgnore
+    private String existingLastname;
+    @JsonIgnore
+    private String existingUsername;
+    @JsonIgnore
+    private String existingPassword;
+    @JsonIgnore
+    private String existingEmail;
+    @JsonIgnore
+    private String existingBirthday;
 
 }
