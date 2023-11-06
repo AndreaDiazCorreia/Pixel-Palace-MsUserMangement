@@ -28,4 +28,9 @@ public class PixelUserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("No se pudo eliminar al usuario");
         }
     }
+    
+    @PutMapping("/{id}")
+    public PixelUser update(@PathVariable Long id, @RequestBody PixelUser user) {
+        return pixelUserService.update(id, user);
+    }
 }
