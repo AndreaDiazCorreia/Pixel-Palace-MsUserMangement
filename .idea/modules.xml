@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/Microservicios-Integrados.iml" filepath="$PROJECT_DIR$/.idea/Microservicios-Integrados.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Pixel-Palace-MsMarketTransactions/msMarketTransactions/msMarketTransactions.iml" filepath="$PROJECT_DIR$/Pixel-Palace-MsMarketTransactions/msMarketTransactions/msMarketTransactions.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Pixel-Palace-MsUserMangement/msUserManagement/msUserManagement.iml" filepath="$PROJECT_DIR$/Pixel-Palace-MsUserMangement/msUserManagement/msUserManagement.iml" />
+    </modules>
+  </component>
+</project>
