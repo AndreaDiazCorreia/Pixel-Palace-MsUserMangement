@@ -1,9 +1,12 @@
 package com.pixelpalace.msUserManagement.controller;
 
+import com.pixelpalace.msUserManagement.Dto.LoginDto;
+import com.pixelpalace.msUserManagement.Dto.PixelUserDto;
+import com.pixelpalace.msUserManagement.Dto.Response.LoginResponse;
 import com.pixelpalace.msUserManagement.model.PixelUser;
 import com.pixelpalace.msUserManagement.service.PixelUserService;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,18 +17,14 @@ public class PixelUserController {
     @Autowired
     PixelUserService pixelUserService;
 
-    @PostMapping
-    public ResponseEntity<?> addUser(@RequestBody PixelUser pixelUser) throws Exception {
-        pixelUserService.postUser(pixelUser);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Usuario creado exitosamente");
-    }
-
-
-    @DeleteMapping(path = "/{id}")
-    public void deleteUser( @PathVariable long id, HttpServletRequest request){
-        PixelUser userDelete =  pixelUserService.findById(id);
-
-        pixelUserService.deleteUser(userDelete);
+    @GetMapping("{id}")
+    public ResponseEntity<PixelUser> findUserById(@PathVariable Long id) {
+        PixelUser user = pixelUserService.findById(id);
+        if (user != null) {
+            return ResponseEntity.ok(user);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @GetMapping("by_username/{username}")
@@ -46,9 +45,28 @@ public class PixelUserController {
             return ResponseEntity.notFound().build();
         }
     }
+    @PostMapping(path = "/save")
+    public ResponseEntity<String> saveUser(@RequestBody PixelUserDto pixelUserDto){
+        String id = pixelUserService.postUser(pixelUserDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Usuario creado con ID: " + id);
+    }
+
+
+    @PostMapping(path = "/login")
+    public ResponseEntity<?>LoginUsername(@RequestBody LoginDto loginDto){
+        LoginResponse loginResponse = pixelUserService.Login_user(loginDto);
+        return  ResponseEntity.ok(loginResponse);
+    }
 
     /*
-    @DeleteMapping(path = "/{id}")
+    @PostMapping
+    public ResponseEntity<?> addUser(@RequestBody PixelUser pixelUser) throws Exception {
+        pixelUserService.postUser(pixelUser);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Usuario creado exitosamente");
+    }
+*/
+
+    @DeleteMapping(path = "{id}")
     public ResponseEntity<Object> deleteUser(@PathVariable("id") long id){
         try {
             pixelUserService.deleteUser(id);
@@ -58,5 +76,10 @@ public class PixelUserController {
         }
     }
 
-     */
+    @PutMapping("/{id}")
+    public PixelUser update(@PathVariable Long id, @RequestBody PixelUser user) throws ChangeSetPersister.NotFoundException {
+        return pixelUserService.update(id, user);
+    }
+
+
 }

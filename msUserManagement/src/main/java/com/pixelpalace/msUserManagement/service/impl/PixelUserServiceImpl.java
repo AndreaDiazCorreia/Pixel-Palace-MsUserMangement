@@ -1,38 +1,120 @@
 package com.pixelpalace.msUserManagement.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pixelpalace.msUserManagement.Dto.LoginDto;
+import com.pixelpalace.msUserManagement.Dto.PixelUserDto;
+import com.pixelpalace.msUserManagement.Dto.Response.LoginResponse;
 import com.pixelpalace.msUserManagement.model.PixelUser;
 import com.pixelpalace.msUserManagement.repository.PixelUserRepository;
 import com.pixelpalace.msUserManagement.service.PixelUserService;
+import com.pixelpalace.msUserManagement.util.Rol;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PixelUserServiceImpl implements PixelUserService {
 
     @Autowired
     PixelUserRepository pixelUserRepository;
-
+    private List<PixelUser> users = new ArrayList<>();
     @Autowired
     ObjectMapper mapper;
-
+ /*
     public void postUser(PixelUser pixelUser) throws Exception{
-        try {
+       try {
             pixelUserRepository.save(pixelUser);
         } catch (Exception e){
             throw new Exception("No se pudo guardar el usuario", e);
         }
+
+
+    }
+
+ */
+
+    @Override
+    public String postUser(PixelUserDto pixelUserDto) {
+
+        PixelUser exiteEmail = pixelUserRepository.findByEmail(pixelUserDto.getEmail());
+        if (exiteEmail != null){
+            return "El correo se encuentre registrado";
+        }
+        PixelUser pixelUser = new PixelUser(pixelUserDto);
+        pixelUser.setRol(Rol.USER);
+
+        try {
+            //pixelUserRepository.save(pixelUser);
+            PixelUser savedUser = pixelUserRepository.save(pixelUser);
+            System.out.println(savedUser);
+            return pixelUser.getUsername();
+        } catch (Exception e) {
+            e.printStackTrace(); // o log.error("Error al guardar el usuario", e);
+            return "Error al guardar el usuario";
+        }
+        //  pixelUserRepository.save(pixelUser);
+
+
     }
 
 
 
-    @Override
-    public void deleteUser(PixelUser pixelUser) {
+    public ResponseEntity<Object> deleteUser(long id){
+        if (!pixelUserRepository.existsById(id)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("El usuario con ID " + id + " no se encontró en la base de datos.");
+        }
 
-        pixelUserRepository.delete(pixelUser);
+        try {
+
+            pixelUserRepository.deleteById(id);
+            return ResponseEntity.ok("El usuario con ID " + id + " ha sido eliminado correctamente.");
+
+        }catch (EmptyResultDataAccessException e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("No se pudo eliminar al usuario.");
+        }
+    }
+
+    @Override
+    public PixelUser update(Long id, PixelUser user) throws ChangeSetPersister.NotFoundException {
+        PixelUser existingUser = pixelUserRepository.findById(id).orElseThrow(() -> new ChangeSetPersister.NotFoundException());
+
+
+        existingUser.setName(user.getName());
+        existingUser.setLastname(user.getLastname());
+        existingUser.setUsername(user.getUsername());
+        existingUser.setPassword(user.getPassword());
+        existingUser.setEmail(user.getEmail());
+        existingUser.setBirthday(user.getBirthday());
+
+
+        return pixelUserRepository.save(existingUser);
+    }
+
+    @Override
+    public LoginResponse Login_user(LoginDto loginDto) {
+        String msg = "";
+        PixelUser pixelUser1 = pixelUserRepository.findByUsername(loginDto.getUsername());
+
+        if (pixelUser1 != null) {
+            String password = loginDto.getPassword();
+            String storedPassword = pixelUser1.getPassword();
+
+            // Utilizando equals() para comparar las contraseñas en lugar de matches()
+            if (storedPassword.equals(password)) {
+                return new LoginResponse("Login Exitoso", true);
+            } else {
+                return new LoginResponse("Login Fallido: Password Incorrecta", false);
+            }
+        } else {
+            return new LoginResponse("Login Fallido: Usuario no Existe", false);
+        }
     }
 
     @Override
@@ -49,7 +131,16 @@ public class PixelUserServiceImpl implements PixelUserService {
     public PixelUser findByEmail(String email) {
         return pixelUserRepository.findByEmail(email);
     }
-
+    @Override
+    public Optional<PixelUser> findOneByUsernameAndPassword(String username, String password) {
+        for (PixelUser user : users) {
+            if (user.getUsername().equals(username) && user.getPassword().matches(password)) {
+                return Optional.of(user);
+            }
+        }
+        return Optional.empty();
+    }
+}
 
 
 /*
@@ -70,5 +161,3 @@ public class PixelUserServiceImpl implements PixelUserService {
 
  */
 
-
-}
